@@ -1,11 +1,13 @@
+// Seleção dos elementos
 const gradeForm = document.getElementById('gradeForm');
 const addGradeButton = document.getElementById('addGrade');
 const gradeList = document.getElementById('gradeList');
 const finalGrade = document.getElementById('finalGrade');
 
+// Array para armazenar as notas
 let grades = [];
 
-// Adicionar nota
+// Função para adicionar nota
 addGradeButton.addEventListener('click', () => {
     const subject = document.getElementById('subject').value.trim();
     const grade = parseFloat(document.getElementById('grade').value);
@@ -16,33 +18,32 @@ addGradeButton.addEventListener('click', () => {
         return;
     }
 
+    // Adicionar nota ao array
     grades.push({ subject, grade, weight });
 
+    // Atualizar lista e calcular média
     updateGradeList();
     calculateFinalGrade();
 
+    // Limpar o formulário
     gradeForm.reset();
 });
 
-// Atualizar lista de notas
+// Função para atualizar a lista de notas
 function updateGradeList() {
-    gradeList.innerHTML = '';
-    grades.forEach((item, index) => {
+    gradeList.innerHTML = ''; // Limpar a tabela
+    grades.forEach(item => {
         const row = document.createElement('tr');
         row.innerHTML = `
             <td>${item.subject}</td>
             <td>${item.grade}</td>
             <td>${item.weight}</td>
-            <td>
-                <button class="btn btn-warning btn-sm" onclick="editGrade(${index})">Editar</button>
-                <button class="btn btn-danger btn-sm" onclick="deleteGrade(${index})">Excluir</button>
-            </td>
         `;
         gradeList.appendChild(row);
     });
 }
 
-// Calcular média final
+// Função para calcular a média final
 function calculateFinalGrade() {
     let totalWeightedGrades = 0;
     let totalWeights = 0;
@@ -52,23 +53,6 @@ function calculateFinalGrade() {
         totalWeights += item.weight;
     });
 
-    const average = (totalWeights === 0) ? 0 : (totalWeightedGrades / totalWeights).toFixed(2);
+    const average = totalWeights === 0 ? 0 : (totalWeightedGrades / totalWeights).toFixed(2);
     finalGrade.textContent = `Média Final: ${average}`;
-}
-
-// Editar nota
-function editGrade(index) {
-    const item = grades[index];
-    document.getElementById('subject').value = item.subject;
-    document.getElementById('grade').value = item.grade;
-    document.getElementById('weight').value = item.weight;
-
-    deleteGrade(index); // Remove a nota antiga para ser atualizada
-}
-
-// Excluir nota
-function deleteGrade(index) {
-    grades.splice(index, 1);
-    updateGradeList();
-    calculateFinalGrade();
 }

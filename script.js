@@ -1,33 +1,46 @@
-function sortear() {
-    const nomesInput = document.getElementById("nomes").value;
-    const nomes = nomesInput.split(",").map(nome => nome.trim()).filter(nome => nome);
+const gradeForm = document.getElementById('gradeForm');
+const addGradeButton = document.getElementById('addGrade');
+const gradeList = document.getElementById('gradeList');
+const finalGrade = document.getElementById('finalGrade');
 
-    if (nomes.length < 2) {
-        document.getElementById("resultado").innerHTML = "<p class='error'>Insira pelo menos dois nomes!</p>";
+let grades = [];
+
+addGradeButton.addEventListener('click', () => {
+    const subject = document.getElementById('subject').value;
+    const grade = parseFloat(document.getElementById('grade').value);
+    const weight = parseInt(document.getElementById('weight').value);
+
+    if (!subject || isNaN(grade) || isNaN(weight)) {
+        alert('Por favor, preencha todos os campos corretamente.');
         return;
     }
 
-    const sorteio = [];
-    const nomesRestantes = [...nomes];
+    grades.push({ subject, grade, weight });
 
-    nomes.forEach(nome => {
-        let escolhidoIndex;
-        do {
-            escolhidoIndex = Math.floor(Math.random() * nomesRestantes.length);
-        } while (nomesRestantes[escolhidoIndex] === nome && nomesRestantes.length > 1);
+    updateGradeList();
+    calculateFinalGrade();
 
-        sorteio.push({ amigo: nome, sorteado: nomesRestantes[escolhidoIndex] });
-        nomesRestantes.splice(escolhidoIndex, 1);
+    gradeForm.reset();
+});
+
+function updateGradeList() {
+    gradeList.innerHTML = '';
+    grades.forEach((item, index) => {
+        const listItem = document.createElement('li');
+        listItem.textContent = `${item.subject}: Nota ${item.grade} (Peso ${item.weight})`;
+        gradeList.appendChild(listItem);
     });
-
-    exibirResultado(sorteio);
 }
 
-function exibirResultado(sorteio) {
-    let resultadoHTML = "<h2>Resultado do Sorteio:</h2><ul>";
-    sorteio.forEach(par => {
-        resultadoHTML += `<li>${par.amigo} → ${par.sorteado}</li>`;
+function calculateFinalGrade() {
+    let totalWeightedGrades = 0;
+    let totalWeights = 0;
+
+    grades.forEach(item => {
+        totalWeightedGrades += item.grade * item.weight;
+        totalWeights += item.weight;
     });
-    resultadoHTML += "</ul>";
-    document.getElementById("resultado").innerHTML = resultadoHTML;
+
+    const average = (totalWeights === 0) ? 0 : (totalWeightedGrades / totalWeights).toFixed(2);
+    finalGrade.textContent = `Média Final: ${average}`;
 }
